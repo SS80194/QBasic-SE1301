@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16)
 
 project(qbasic-make VERSION 0.1 LANGUAGES CXX)
 
+set(ENV{QT_ASSUME_STDERR_HAS_CONSOLE} "1")
+
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -17,6 +19,10 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
+        program.cpp
+        program.h
+        statement.cpp
+        statement.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -55,7 +61,7 @@ set_target_properties(qbasic-make PROPERTIES
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
+    WIN32_EXECUTABLE OFF
 )
 
 include(GNUInstallDirs)
