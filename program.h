@@ -24,6 +24,7 @@ public:
     bool execute();
     void clear();
     void update();
+    void input(const QString& s);//Ask a value and store it in the variable s
     ~Program();
 };
 

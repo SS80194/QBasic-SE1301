@@ -84,15 +84,15 @@ void MainWindow::setUIExitDebugMode(){
 */
 bool MainWindow::parseCommand(const QString& s)
 {
-    //TODO:write a parser to parse the command.
+    //split the command into two parts,seperated by the first space
+    //store in argv0 and argv1.
     QString trimmed = s.trimmed();
     int firstSpaceIndex = trimmed.indexOf(' ');
     QString argv0,argv1;
     argv0 = trimmed.left(firstSpaceIndex);
     if(firstSpaceIndex != -1) argv1 = trimmed.mid(firstSpaceIndex + 1).trimmed();
     else argv1 = "";
-    //qDebug()<<"s: "<<s<<", trimmed: "<<trimmed<<", firstSpaceIndex: "<<firstSpaceIndex;
-    //qDebug()<<"argv0: "<<argv0<<", argv1: "<<argv1;
+    
     if (QString::compare(argv0, "LOAD") == 0) {
         // Handle LOAD command
         if(askAndLoadProgram()) return true;

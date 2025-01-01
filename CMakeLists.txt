@@ -23,6 +23,8 @@ set(PROJECT_SOURCES
         program.h
         statement.cpp
         statement.h
+        expression.cpp
+        expression.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

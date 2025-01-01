@@ -13,6 +13,7 @@ public:
     Statement(Program* parent);
     QString getStatement();
     void setStatement(const QString& s);
-    void execute();
+    int execute();
+    bool judgeCondition(const QString& exp1, const QString& exp2, const QString& opt);
 };
 #endif // STATEMENT_H

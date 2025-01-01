@@ -49,7 +49,45 @@ bool Program::updateStatement(int line, const QString& s)
 bool Program::execute()
 {
     //TODO
-    return true;
+    if(!pc){
+        pc = statements.begin()->first;
+        qDebug() << "pc: " << pc;
+    }
+    try{
+        while(pc != -1){
+            qDebug() << "pc: " << pc;
+            if(statements.find(pc) == statements.end())
+                return false;
+            int retpc = statements[pc]->execute();
+            qDebug()<<statements[pc]->getStatement();
+            if(retpc == -1)
+                return false;
+            else if(retpc == 0){
+                //retpc = 0: no coontrol flow change
+                auto itr = statements.find(pc);
+                ++itr;
+                if(itr == statements.end())
+                    pc = -1;
+                else
+                    pc = itr->first;
+            }
+            else if(retpc == -2){
+                //retpc = -2: END statement
+                return true;
+            }
+            else{
+                pc = retpc;//retpc != 0: control flow change
+                if(statements.find(pc) == statements.end())
+                    throw std::invalid_argument("Invalid line number");
+            }
+        }
+        return true;
+    }
+    catch(std::exception& e){
+        qDebug() << e.what();
+        return false;
+    }
+    
 }
 
 /* Program::clear
@@ -82,4 +120,14 @@ void Program::update()
             parent->ui->CodeDisplay->append(QString::number(it->first) + " " + it->second->getStatement());
         }
     }
+}
+
+/* Program::input
+* Ask a value and store it in the variable s
+*/
+void Program::input(const QString& s)
+{
+    //TODO: implement input
+    //WAIT TO BE IMPLEMENTED
+    variables[s] = 0;
 }
