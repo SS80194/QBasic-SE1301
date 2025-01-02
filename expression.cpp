@@ -1,7 +1,7 @@
 #include "expression.h"
 #include "program.h"
 #include <QDebug>
-
+#include <QQueue>
 
 /*
  * ExpressionNode
@@ -88,6 +88,7 @@ ExpressionNode* Expression::parsePower(){
 }
 
 ExpressionNode* Expression::parseFactor(){
+    if(pos==tokens.size()) throw std::invalid_argument("Invalid expression");
     if(tokens[pos].type==ExpNodeType::variable){
         ExpressionNode* node = new ExpressionNode(tokens[pos]);
         consume();
@@ -131,4 +132,31 @@ int Expression::calculateTree(ExpressionNode* node){
         return node->value;
     }
     else throw std::invalid_argument("Invalid expression");
+}
+
+/*
+ * Get the expression tree in string format.
+ */
+QString Expression::getExpressionTree(){
+    if (!root) return "";
+    QString result;
+    QQueue<ExpressionNode*> q;
+    QQueue<int> offset_q;
+    q.enqueue(root);
+    offset_q.enqueue(0);
+    
+    while(!q.isEmpty()){
+        ExpressionNode* node = q.dequeue();
+        int offset = offset_q.dequeue();
+        for(ExpressionNode* child : node->children){
+            q.enqueue(child);
+            offset_q.enqueue(offset+1);
+        }
+        QString str = "";
+        for(int i=0;i<offset+1;i++) str += "    ";
+        str += node->s;
+        result += str + "\n";
+    }
+    
+    return result;
 }

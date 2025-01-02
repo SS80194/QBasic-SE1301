@@ -47,6 +47,8 @@ private:
     ExpressionNode* parsePower();
     ExpressionNode* parseFactor();
 
+public:
+    QString getExpressionTree();
     int calculateTree(ExpressionNode* node);
 };
 

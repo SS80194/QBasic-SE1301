@@ -33,14 +33,22 @@ bool Program::updateStatement(int line, const QString& s)
         statements.erase(line);
     }
     else{
-        if(statements.find(line) != statements.end()) {
-            statements[line]->setStatement(s);
+        try{
+            if(statements.find(line) != statements.end()) {
+                statements[line]->setStatement(s);
+            }
+            else{
+                statements[line] = new Statement(this);
+                statements[line]->setStatement(s);
+            }
         }
-        else{
-            statements[line] = new Statement(this);
-            statements[line]->setStatement(s);
+        catch(std::exception& e){
+            qDebug() << e.what();
+            return false;
         }
+
     }
+
     update();
     return true;
 }
@@ -117,8 +125,10 @@ void Program::update()
 {
     if(parent != nullptr) {
         parent->ui->CodeDisplay->clear();
+        parent->ui->treeDisplay->clear();
         for(auto it = statements.begin(); it != statements.end(); ++it) {
             parent->ui->CodeDisplay->append(QString::number(it->first) + " " + it->second->getStatement());
+            parent->ui->treeDisplay->append(QString::number(it->first) + " " +it->second->getStatementTree());
         }
     }
 }
