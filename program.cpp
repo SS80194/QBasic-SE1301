@@ -122,6 +122,16 @@ void Program::update()
     }
 }
 
+/* Program::output
+* Output the string s to the output window.
+*/
+void Program::output(const QString& s)
+{
+    if(parent != nullptr) {
+        parent->ui->textBrowser->append(s);
+    }
+}
+
 /* Program::input
 * Ask a value and store it in the variable s
 */

@@ -37,9 +37,10 @@ int Statement::execute()
     else argv1 = "";
 
     if(QString::compare(argv0,"PRINT") == 0){
-        Expression evaluator(argv1);
+        Expression evaluator(argv1,parent);
         int result = evaluator.evaluate();
-        qDebug() << result;
+        parent->output(QString::number(result));
+        //qDebug() << result;
         return 0;
     }
     else if(QString::compare(argv0,"INPUT") == 0){
@@ -55,7 +56,7 @@ int Statement::execute()
         QString varName = argv1.left(equalIndex).trimmed();
         QString expression = argv1.mid(equalIndex + 1).trimmed();
 
-        Expression evaluator(expression);
+        Expression evaluator(expression,parent);
         int result = evaluator.evaluate();
         parent->variables[varName] = result;
         return 0;
@@ -109,8 +110,8 @@ int Statement::execute()
 bool Statement::judgeCondition(const QString& exp1, const QString& exp2, const QString& opt)
 {
     //implement condition judgment
-    Expression evaluator1(exp1);
-    Expression evaluator2(exp2);
+    Expression evaluator1(exp1,parent);
+    Expression evaluator2(exp2,parent);
     int value1 = evaluator1.evaluate();
     int value2 = evaluator2.evaluate();
     if(opt == "=") return value1 == value2;

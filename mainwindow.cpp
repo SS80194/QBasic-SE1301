@@ -3,6 +3,7 @@
 #include "program.h"
 #include <QFileDialog>
 #include <QMessageBox>
+#include "config.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -120,7 +121,11 @@ bool MainWindow::parseCommand(const QString& s)
 }
 
 bool MainWindow::askAndLoadProgram(){
-    //TODO:
+    if(debugMode) {
+        loadProgram(testFilename);
+        executeProgram();
+        return true;
+    }
     QString filename = QFileDialog::getOpenFileName(this, tr("Open Program"), "", tr("Program Files (*.txt *.bas)"));
     if (!filename.isEmpty()) {
         return loadProgram(filename);

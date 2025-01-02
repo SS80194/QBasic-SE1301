@@ -6,6 +6,7 @@
 #include "statement.h"
 
 class MainWindow;
+class Tokenizer;
 
 class Program
 {
@@ -17,6 +18,8 @@ private:
 /* Pool of variables.*/
     std::map<QString, int> variables;
 friend class Statement;
+friend class Tokenizer;
+friend class Expression;
 
 public:
     Program(MainWindow *parent);
@@ -24,6 +27,7 @@ public:
     bool execute();
     void clear();
     void update();
+    void output(const QString& s);
     void input(const QString& s);//Ask a value and store it in the variable s
     ~Program();
 };
