@@ -34,6 +34,23 @@ void MainWindow::on_cmdLineEdit_editingFinished()
     QString cmd = ui->cmdLineEdit->text();
     ui->cmdLineEdit->setText("");
 
+    if(waitInput){
+        bool ok;
+        if (cmd.startsWith("?")) {
+            cmd = cmd.mid(1);
+            qDebug() << "cmd: " << cmd;
+        }
+        int value = cmd.toInt(&ok);
+        if (ok) {
+            inputValue = value;
+            waitInput = false;
+            return ;
+        } else {
+            QMessageBox::warning(this, "Input Error", "The input is not a valid integer.");
+            ui->cmdLineEdit->setText("?");
+            return ;
+        }
+    }
     //ui->CodeDisplay->append(cmd);
     parseCommand(cmd);
 }

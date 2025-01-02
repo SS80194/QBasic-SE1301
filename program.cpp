@@ -4,6 +4,7 @@
 #include "statement.h"
 #include <QFile>
 #include <QTextStream>
+#include <QTimer>
 
 
 /*Program::Program
@@ -139,5 +140,20 @@ void Program::input(const QString& s)
 {
     //TODO: implement input
     //WAIT TO BE IMPLEMENTED
-    variables[s] = 0;
+    parent->waitInput = true;
+    
+    parent->ui->cmdLineEdit->setText("?");
+
+    QEventLoop loop;
+    //set a timer to check if the parent->waitInput is false
+    QTimer timer;
+    QObject::connect(&timer, &QTimer::timeout, [&]() {
+        if (parent->waitInput == false) {
+            loop.quit();
+        }
+    });
+    timer.start(10);
+    loop.exec();
+
+    variables[s] = parent->inputValue;
 }

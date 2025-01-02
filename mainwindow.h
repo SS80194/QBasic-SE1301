@@ -26,6 +26,10 @@ private:
     void setUIExitDebugMode();
 
 public:
+    bool waitInput = false;
+    int inputValue = 0;
+    void askForInput(const QString& s);
+
     friend class Program;
     bool parseCommand(const QString& s);
     bool askAndLoadProgram();
