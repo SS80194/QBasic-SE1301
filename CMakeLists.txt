@@ -27,6 +27,8 @@ set(PROJECT_SOURCES
         expression.h
         config.cpp
         config.h
+        tokenizer.cpp
+        tokenizer.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
