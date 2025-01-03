@@ -12,7 +12,7 @@ Statement::Statement(Program* parent)
 void Statement::setStatement(const QString& s)
 {
     this->s = s;
-    parse();
+    //parse();
 }
 
 QString Statement::getStatement()

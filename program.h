@@ -38,6 +38,7 @@ public:
     void init();
     void clear();
     void update();
+    void updateTreeDisplay();
     void output(const QString& s);
     void input(const QString& s);//Ask a value and store it in the variable s
     ~Program();
@@ -53,6 +54,7 @@ public:
     void exitDebug();
     void resume();
     void executeStatement(const QString& s);
+    bool parseAllStatements();
 };
 
 #endif // PROGRAM_H

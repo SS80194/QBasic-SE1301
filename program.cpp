@@ -5,7 +5,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QTimer>
-
+#include <QMessageBox>
 
 /*Program::Program
 * Initialize the program.parent is the pointer to mainwindow.
@@ -74,7 +74,7 @@ void Program::executeStatement(const QString& s){
         delete st;
     }
     catch(std::exception& e){
-        //qDebug() << e.what();
+        QMessageBox::critical(parent, "Error", QString(e.what()));
     }
 }
 /* Program::execute
@@ -84,6 +84,8 @@ bool Program::execute()
 {
     //TODO
     init();
+    if(!parseAllStatements()) return false;
+    else updateTreeDisplay();
     try{
         while(pc != -1){
             //qDebug() << "pc: " << pc<<"DEBUG MODE: "<<debug;
@@ -119,15 +121,17 @@ bool Program::execute()
                 return true;
             }
             else{
+                if(statements.find(retpc) == statements.end()){
+                    QMessageBox::critical(parent, "Error", QString("Invalid GOTO line number %1 on Line %2").arg(retpc).arg(pc));
+                    return false;
+                }
                 pc = retpc;//retpc != 0: control flow change
-                if(statements.find(pc) == statements.end())
-                    throw std::invalid_argument("Invalid line number");
             }
         }
         return true;
     }
     catch(std::exception& e){
-        //qDebug() << e.what();
+        QMessageBox::critical(parent, "Error", QString("Line %1: %2").arg(pc).arg(e.what()));
         return false;
     }
 }
@@ -149,6 +153,7 @@ void Program::clear()
     variables.clear();
     pc = 0;
     update();
+    updateTreeDisplay();
 }
 
 Program::~Program()
@@ -163,10 +168,22 @@ void Program::update()
 {
     if(parent != nullptr && !background) {
         parent->ui->CodeDisplay->clear();
-        parent->ui->treeDisplay->clear();
         for(auto it = statements.begin(); it != statements.end(); ++it) {
             parent->ui->CodeDisplay->append(QString::number(it->first) + " " + it->second->getStatement());
-            parent->ui->treeDisplay->append(QString::number(it->first) + " " +it->second->getStatementTree());
+        }
+        //updateTreeDisplay();
+    }
+}
+
+/* Program::updateTreeDisplay
+* Update the syntax tree display to the UI.
+*/
+void Program::updateTreeDisplay()
+{
+    if(parent != nullptr && !background) {
+        parent->ui->treeDisplay->clear();
+        for(auto it = statements.begin(); it != statements.end(); ++it) {
+            parent->ui->treeDisplay->append(QString::number(it->first) + " " + it->second->getStatementTree());
         }
     }
 }
@@ -318,4 +335,27 @@ void Program::exitDebug(){
 void Program::resume(){
     debug = true;
     breakpoint_blocked = false;
+}
+
+/* Program::parseAllStatements
+* Parse all statements in order of line number.
+* Return false if any statement has syntax error.
+*/
+bool Program::parseAllStatements()
+{
+    for(auto it = statements.begin(); it != statements.end(); ++it) {
+        try {
+            Statement* stmt = it->second;
+            if (stmt) {
+                stmt->parse();  // 这会抛出异常如果语法错误
+            }
+        } catch (const std::exception& e) {
+            if (!background) {
+                QMessageBox::critical(parent, "Syntax Error", 
+                    QString("Line %1: %2").arg(it->first).arg(e.what()));
+            }
+            return false;
+        }
+    }
+    return true;
 }
