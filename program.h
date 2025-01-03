@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <map>
+#include <set>
 #include "statement.h"
 
 class MainWindow;
@@ -17,19 +18,38 @@ private:
     std::map<int, Statement*> statements;
 /* Pool of variables.*/
     std::map<QString, int> variables;
+/* Useful in debug mode*/
+    bool debug=false;
+    bool breakpoint_blocked=false;
+    std::set<int> breakpoints;
 friend class Statement;
 friend class Tokenizer;
 friend class Expression;
 
 public:
+    void blockTillFalse(bool &var);
+
+public:
     Program(MainWindow *parent);
     bool updateStatement(int line, const QString& s);
     bool execute();
+    void init();
     void clear();
     void update();
     void output(const QString& s);
     void input(const QString& s);//Ask a value and store it in the variable s
     ~Program();
+/* Debug mode*/
+    bool inDebugMode();
+    void setDebugMode(bool debug);
+    void setBreakpoint(int line);
+    void removeBreakpoint(int line);
+    void clearBreakpoints();
+    bool isBreakpoint(int line);
+    QString showVariables();
+    QString showBreakpoints();
+    void exitDebug();
+    void resume();
 };
 
 #endif // PROGRAM_H

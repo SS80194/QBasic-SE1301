@@ -13,7 +13,6 @@ MainWindow::MainWindow(QWidget *parent)
     setUIExitDebugMode();
 
     connect(ui->btnDebugMode, &QPushButton::clicked, this, &MainWindow::setUIForDebugMode);
-    connect(ui->btnExitDebugMode, &QPushButton::clicked, this, &MainWindow::setUIExitDebugMode);
     
     program = new Program(this);
 
@@ -21,7 +20,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->btnRunCode, &QPushButton::clicked, this, &MainWindow::executeProgram);
     connect(ui->btnClearCode, &QPushButton::clicked, this, &MainWindow::clearProgram);
     
-    
+    connect(ui->btnDebugResume, &QPushButton::clicked, this, &MainWindow::resumeProgram);
+    connect(ui->btnExitDebugMode, &QPushButton::clicked, this, &MainWindow::ExitDebugMode);
+
 }
 
 MainWindow::~MainWindow()
@@ -70,6 +71,8 @@ void MainWindow::setUIForDebugMode(){
     ui->monitorDisplay->setVisible(true);
     ui->labelBreakPoints->setVisible(true);
     ui->breakPointsDisplay->setVisible(true);
+
+    program->setDebugMode(true);
 }
 
 void MainWindow::setUIExitDebugMode(){
@@ -132,7 +135,28 @@ bool MainWindow::parseCommand(const QString& s)
         // Handle <number> <statement> command
         if(program->updateStatement(argv0.toInt(), argv1)) 
             return true;
-    } 
+    } else if (QString::compare(argv0, "ADD") == 0) {
+        // Handle ADD command
+        if(!program->inDebugMode()) return false;
+        bool ok;
+        int line = argv1.toInt(&ok);
+        if (!ok) {
+            QMessageBox::warning(this, "Invalid Argument", "The argument for ADD command is not a valid integer.");
+            return false;
+        }
+        program->setBreakpoint(line);
+        return true;
+    } else if (QString::compare(argv0, "DELETE") == 0) {
+    if(!program->inDebugMode()) return false;
+        bool ok;
+        int line = argv1.toInt(&ok);
+        if (!ok) {
+            QMessageBox::warning(this, "Invalid Argument", "The argument for ADD command is not a valid integer.");
+            return false;
+        }
+        program->removeBreakpoint(line);
+        return true;
+    }
     // Default:Handle invalid command
     return false;
 }
@@ -176,5 +200,26 @@ bool MainWindow::executeProgram(){
 bool MainWindow::clearProgram(){
     program->clear();
     return true;
+}
+
+void MainWindow::updateBreakPoint(const QString& s){
+    ui->breakPointsDisplay->setText(s);
+}
+
+void MainWindow::updateVariables(const QString& s){
+    ui->monitorDisplay->setText(s);
+}
+
+void MainWindow::resumeProgram(){
+    program->resume();
+}
+
+void MainWindow::ExitDebugMode(){
+    program->exitDebug();
+    setUIExitDebugMode();
+}
+
+void MainWindow::updateOutput(const QString& s){
+    ui->textBrowser->setText(s);
 }
 

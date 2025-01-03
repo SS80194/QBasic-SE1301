@@ -36,5 +36,10 @@ public:
     bool loadProgram(const QString& filename);
     bool executeProgram();
     bool clearProgram();
+    void updateBreakPoint(const QString& s);
+    void updateVariables(const QString& s);
+    void updateOutput(const QString& s);
+    void resumeProgram();
+    void ExitDebugMode();
 };
 #endif // MAINWINDOW_H

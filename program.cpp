@@ -16,6 +16,16 @@ Program::Program(MainWindow *parent)
     pc = 0;
 }
 
+/* Program::init
+* Initialize the program:
+* - clear all variables.
+* - set pc to the first line of the program.
+*/
+void Program::init(){
+    pc = statements.begin()->first;
+    variables.clear();
+}
+
 /* Program::updateStatement
 * Input:
 *   line: the line number of the statement to update
@@ -58,15 +68,22 @@ bool Program::updateStatement(int line, const QString& s)
 bool Program::execute()
 {
     //TODO
-    if(!pc){
-        pc = statements.begin()->first;
-        qDebug() << "pc: " << pc;
-    }
+    init();
     try{
         while(pc != -1){
-            qDebug() << "pc: " << pc;
+            //qDebug() << "pc: " << pc<<"DEBUG MODE: "<<debug;
             if(statements.find(pc) == statements.end())
                 return false;
+            if(debug&&isBreakpoint(pc)){//in debug mode
+                //TODO: handle the breakpoint function.
+                //qDebug()<<"breakpoint reached";
+                breakpoint_blocked = true;
+                parent->updateVariables(showVariables());
+
+                blockTillFalse(breakpoint_blocked);
+                if(!debug) return true;
+                //If the block is ended by "EXIT" command, end the execution.
+            }
             int retpc = statements[pc]->execute();
             qDebug()<<statements[pc]->getStatement();
             if(retpc == -1)
@@ -148,22 +165,119 @@ void Program::output(const QString& s)
 */
 void Program::input(const QString& s)
 {
-    //TODO: implement input
-    //WAIT TO BE IMPLEMENTED
+    
     parent->waitInput = true;
     
     parent->ui->cmdLineEdit->setText("?");
 
+    blockTillFalse(parent->waitInput);
+
+    variables[s] = parent->inputValue;
+}
+
+/* Program::blockTillFalse
+ * Block the program until the variable var is false.
+ */
+void Program::blockTillFalse(bool &var){
     QEventLoop loop;
     //set a timer to check if the parent->waitInput is false
     QTimer timer;
     QObject::connect(&timer, &QTimer::timeout, [&]() {
-        if (parent->waitInput == false) {
+        if (var == false) {
             loop.quit();
         }
     });
     timer.start(10);
     loop.exec();
+}
 
-    variables[s] = parent->inputValue;
+/*------Debug mode------*/
+
+/* Program::inDebugMode
+* Enter the debug mode.
+*/
+bool Program::inDebugMode(){
+    return debug;
+}
+
+/* Program::setDebugMode
+* Set the debug mode.
+*/
+void Program::setDebugMode(bool debug_res){
+    this->debug = debug_res;
+    parent->updateOutput(QString());
+    init();
+}
+
+/* Program::setBreakpoint
+* Set a breakpoint at the line number line.
+*/
+void Program::setBreakpoint(int line){
+    breakpoints.insert(line);
+    parent->updateBreakPoint(showBreakpoints());
+}
+
+/* Program::removeBreakpoint
+* Remove a breakpoint at the line number line.
+*/
+void Program::removeBreakpoint(int line){
+    if(breakpoints.find(line) != breakpoints.end()){
+        breakpoints.erase(line);
+        parent->updateBreakPoint(showBreakpoints());
+    }
+}       
+
+/* Program::clearBreakpoints
+* Clear all breakpoints.
+*/
+void Program::clearBreakpoints(){
+    breakpoints.clear();
+    parent->updateBreakPoint(showBreakpoints());
+}
+
+/* Program::isBreakpoint
+* Check if the line number line is a breakpoint.
+*/
+bool Program::isBreakpoint(int line){
+    return breakpoints.find(line) != breakpoints.end();
+}
+
+/*Program::showVariables
+* Show all variables.
+*/
+QString Program::showVariables(){
+    QString res;
+    for(auto it = variables.begin(); it != variables.end(); ++it) {
+        res += it->first + " = " + QString::number(it->second) + "\n";
+    }
+    return res;
+}
+
+/* Program::showBreakpoints
+ * Show all breakpoints.
+ */
+QString Program::showBreakpoints(){
+    QString res;
+    for(auto it = breakpoints.begin(); it != breakpoints.end(); ++it) {
+        res += QString::number(*it) + "\n";
+    }
+    return res;
+}
+
+/* Program::exitDebug
+* Exit the debug mode.
+*/
+void Program::exitDebug(){
+    debug = false;
+    breakpoint_blocked = false;
+    clearBreakpoints();
+    parent->updateOutput(QString());
+}
+
+/* Program::resume
+* Resume the program.
+*/
+void Program::resume(){
+    debug = true;
+    breakpoint_blocked = false;
 }
