@@ -12,10 +12,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setUIExitDebugMode();
 
-    connect(ui->btnDebugMode, &QPushButton::clicked, this, &MainWindow::setUIForDebugMode);
     
     program = new Program(this);
     program_temp = new Program(this,true);
+    
+    connect(ui->btnDebugMode, &QPushButton::clicked, this, &MainWindow::setUIForDebugMode);
 
     connect(ui->btnLoadCode, &QPushButton::clicked, this, &MainWindow::askAndLoadProgram);
     connect(ui->btnRunCode, &QPushButton::clicked, this, &MainWindow::executeProgram);
@@ -42,13 +43,16 @@ void MainWindow::on_cmdLineEdit_editingFinished()
             cmd = cmd.mid(1);
             qDebug() << "cmd: " << cmd;
         }
-        else return;
         int value = cmd.toInt(&ok);
         if (ok) {
             inputValue = value;
             waitInput = false;
             return ;
         } else {
+            if(!waitInput){
+                ui->cmdLineEdit->setText("");
+                return;
+            }
             QMessageBox::warning(this, "Input Error", "The input is not a valid integer.");
             ui->cmdLineEdit->setText("?");
             return ;
@@ -59,6 +63,8 @@ void MainWindow::on_cmdLineEdit_editingFinished()
 }
 
 void MainWindow::setUIForDebugMode(){
+    program->setDebugMode(true);
+
     ui->btnClearCode->setVisible(false);
     ui->btnLoadCode->setVisible(false);
     ui->btnDebugMode->setVisible(false);
@@ -73,8 +79,6 @@ void MainWindow::setUIForDebugMode(){
     ui->monitorDisplay->setVisible(true);
     ui->labelBreakPoints->setVisible(true);
     ui->breakPointsDisplay->setVisible(true);
-
-    program->setDebugMode(true);
 }
 
 void MainWindow::setUIExitDebugMode(){

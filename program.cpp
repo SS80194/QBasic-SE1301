@@ -244,11 +244,13 @@ bool Program::inDebugMode(){
 */
 void Program::setDebugMode(bool debug_res){
     this->debug = debug_res;
-    ended = false;
+    ended = true;
     if (!background) {
         parent->updateOutput(QString());
-        parent->ui->cmdLineEdit->setText("");
+        parent->ui->treeDisplay->clear();
         parent->waitInput = false;
+        //qDebug()<<"waitInput unbanned";
+        parent->ui->cmdLineEdit->setText("");
     }
     init();
 }
