@@ -182,6 +182,7 @@ bool MainWindow::loadProgram(const QString& filename){
     }
     QTextStream in(&file);
     QString line;
+    program->clear();
     while (!in.atEnd()) {
         line = in.readLine();
         if(!parseCommand(line)){
@@ -190,6 +191,7 @@ bool MainWindow::loadProgram(const QString& filename){
             return false;
         }
     }
+    updateOutput(QString());
     return true;
 }
 
