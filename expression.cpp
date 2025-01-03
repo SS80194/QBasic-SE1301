@@ -126,8 +126,14 @@ int Expression::calculateTree(ExpressionNode* node){
         if(node->opt==ExpOperation::add) node->value = left+right;
         else if(node->opt==ExpOperation::sub) node->value = left-right;
         else if(node->opt==ExpOperation::mul) node->value = left*right;
-        else if(node->opt==ExpOperation::divide) node->value = left/right;
-        else if(node->opt==ExpOperation::mod) node->value = left%right;
+        else if(node->opt==ExpOperation::divide){   
+            if(right==0) throw std::invalid_argument("Division by zero");
+            node->value = left/right;
+        }
+        else if(node->opt==ExpOperation::mod){
+            if(right==0) throw std::invalid_argument("Division by zero");
+            node->value = left%right;
+        }
         else if(node->opt==ExpOperation::power) node->value = pow(left,right);
         return node->value;
     }
