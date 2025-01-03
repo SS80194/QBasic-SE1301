@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->btnDebugMode, &QPushButton::clicked, this, &MainWindow::setUIForDebugMode);
     
     program = new Program(this);
+    programtemp = new ProgramTemp(this);
 
     connect(ui->btnLoadCode, &QPushButton::clicked, this, &MainWindow::askAndLoadProgram);
     connect(ui->btnRunCode, &QPushButton::clicked, this, &MainWindow::executeProgram);
@@ -158,6 +159,16 @@ bool MainWindow::parseCommand(const QString& s)
         }
         program->removeBreakpoint(line);
         return true;
+    } else if(QString::compare(argv0, "PRINT") == 0){
+        if(program->inDebugMode()) return false;
+    }
+    else if(QString::compare(argv0, "LET") == 0){
+        if(program->inDebugMode()) return false;
+    }
+    else if(QString::compare(argv0, "INPUT") == 0){
+        //handle the command in programtemp
+        if(program->inDebugMode()) return false;
+        return false;
     }
     // Default:Handle invalid command
     return false;
