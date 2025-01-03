@@ -10,9 +10,10 @@
 /*Program::Program
 * Initialize the program.parent is the pointer to mainwindow.
 */
-Program::Program(MainWindow *parent)
+Program::Program(MainWindow *parent, bool background)
 {
     this->parent = parent;
+    this->background = background;
     pc = 0;
 }
 
@@ -62,6 +63,19 @@ bool Program::updateStatement(int line, const QString& s)
 
     update();
     return true;
+}
+
+void Program::executeStatement(const QString& s){
+    try{
+        Statement * st = new Statement(this);
+        st->setStatement(s);
+        st->parse();
+        st->execute();
+        delete st;
+    }
+    catch(std::exception& e){
+        qDebug() << e.what();
+    }
 }
 /* Program::execute
 * Execute the program.
@@ -148,7 +162,7 @@ Program::~Program()
 */
 void Program::update()
 {
-    if(parent != nullptr) {
+    if(parent != nullptr && !background) {
         parent->ui->CodeDisplay->clear();
         parent->ui->treeDisplay->clear();
         for(auto it = statements.begin(); it != statements.end(); ++it) {
@@ -173,13 +187,10 @@ void Program::output(const QString& s)
 */
 void Program::input(const QString& s)
 {
-    
     parent->waitInput = true;
-    
     parent->ui->cmdLineEdit->setText("?");
-
     blockTillFalse(parent->waitInput);
-
+    qDebug() << "input variable: " << s << "input value: " << parent->inputValue;
     variables[s] = parent->inputValue;
 }
 
@@ -214,9 +225,11 @@ bool Program::inDebugMode(){
 void Program::setDebugMode(bool debug_res){
     this->debug = debug_res;
     ended = false;
-    parent->updateOutput(QString());
-    parent->ui->cmdLineEdit->setText("");
-    parent->waitInput = false;
+    if (!background) {
+        parent->updateOutput(QString());
+        parent->ui->cmdLineEdit->setText("");
+        parent->waitInput = false;
+    }
     init();
 }
 
@@ -225,7 +238,9 @@ void Program::setDebugMode(bool debug_res){
 */
 void Program::setBreakpoint(int line){
     breakpoints.insert(line);
-    parent->updateBreakPoint(showBreakpoints());
+    if (!background) {
+        parent->updateBreakPoint(showBreakpoints());
+    }
 }
 
 /* Program::removeBreakpoint
@@ -234,7 +249,9 @@ void Program::setBreakpoint(int line){
 void Program::removeBreakpoint(int line){
     if(breakpoints.find(line) != breakpoints.end()){
         breakpoints.erase(line);
-        parent->updateBreakPoint(showBreakpoints());
+        if (!background) {
+            parent->updateBreakPoint(showBreakpoints());
+        }
     }
 }       
 
@@ -243,7 +260,9 @@ void Program::removeBreakpoint(int line){
 */
 void Program::clearBreakpoints(){
     breakpoints.clear();
-    parent->updateBreakPoint(showBreakpoints());
+    if (!background) {
+        parent->updateBreakPoint(showBreakpoints());
+    }
 }
 
 /* Program::isBreakpoint
@@ -284,8 +303,10 @@ void Program::exitDebug(){
     breakpoint_blocked = false;
     parent->waitInput = false;
     clearBreakpoints();
-    parent->updateOutput(QString());
-    parent->ui->cmdLineEdit->setText("");
+    if (!background) {
+        parent->updateOutput(QString());
+        parent->ui->cmdLineEdit->setText("");
+    }
 }
 
 /* Program::resume

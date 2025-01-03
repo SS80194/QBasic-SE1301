@@ -152,6 +152,7 @@ int Statement::execute()
 
         Expression evaluator(expression,parent);
         int result = evaluator.evaluate();
+        qDebug() << "input variable: " << varName << "input value: " << result;
         parent->variables[varName] = result;
         return 0;
     }

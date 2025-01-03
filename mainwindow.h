@@ -21,6 +21,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     Program *program;
+    Program *program_temp;
 
     void setUIForDebugMode();
     void setUIExitDebugMode();

@@ -12,6 +12,7 @@ class Tokenizer;
 class Program
 {
 private:
+    bool background=false;
     MainWindow *parent;
 /* Statements of the program.*/
     int pc;//program counter: the current line number of the program
@@ -31,7 +32,7 @@ public:
     void blockTillFalse(volatile bool &var);
 
 public:
-    Program(MainWindow *parent);
+    Program(MainWindow *parent, bool background = false);
     bool updateStatement(int line, const QString& s);
     bool execute();
     void init();
@@ -51,6 +52,7 @@ public:
     QString showBreakpoints();
     void exitDebug();
     void resume();
+    void executeStatement(const QString& s);
 };
 
 #endif // PROGRAM_H
