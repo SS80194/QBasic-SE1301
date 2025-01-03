@@ -26,7 +26,7 @@ private:
     void setUIExitDebugMode();
 
 public:
-    bool waitInput = false;
+    volatile bool waitInput = false;
     int inputValue = 0;
     void askForInput(const QString& s);
 

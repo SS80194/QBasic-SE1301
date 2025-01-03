@@ -41,6 +41,7 @@ void MainWindow::on_cmdLineEdit_editingFinished()
             cmd = cmd.mid(1);
             qDebug() << "cmd: " << cmd;
         }
+        else return;
         int value = cmd.toInt(&ok);
         if (ok) {
             inputValue = value;

@@ -24,6 +24,7 @@ Program::Program(MainWindow *parent)
 void Program::init(){
     pc = statements.begin()->first;
     variables.clear();
+    ended = false;
 }
 
 /* Program::updateStatement
@@ -72,6 +73,7 @@ bool Program::execute()
     try{
         while(pc != -1){
             //qDebug() << "pc: " << pc<<"DEBUG MODE: "<<debug;
+            if(ended) return true;
             if(statements.find(pc) == statements.end())
                 return false;
             if(debug&&isBreakpoint(pc)){//in debug mode
@@ -81,10 +83,11 @@ bool Program::execute()
                 parent->updateVariables(showVariables());
 
                 blockTillFalse(breakpoint_blocked);
-                if(!debug) return true;
+                if(!debug||ended) return true;
                 //If the block is ended by "EXIT" command, end the execution.
             }
             int retpc = statements[pc]->execute();
+            if(ended) return true;
             qDebug()<<statements[pc]->getStatement();
             if(retpc == -1)
                 return false;
@@ -124,6 +127,11 @@ void Program::clear()
     for(auto it = statements.begin(); it != statements.end(); ++it) {
         delete it->second;
     }
+    ended = true;
+    debug = false;
+    parent->waitInput = false;
+    breakpoint_blocked = false;
+    parent->ui->cmdLineEdit->setText("");
     statements.clear();
     variables.clear();
     pc = 0;
@@ -178,9 +186,9 @@ void Program::input(const QString& s)
 /* Program::blockTillFalse
  * Block the program until the variable var is false.
  */
-void Program::blockTillFalse(bool &var){
+void Program::blockTillFalse(volatile bool &var){
     QEventLoop loop;
-    //set a timer to check if the parent->waitInput is false
+    //set a timer to check if the var is false
     QTimer timer;
     QObject::connect(&timer, &QTimer::timeout, [&]() {
         if (var == false) {
@@ -205,7 +213,10 @@ bool Program::inDebugMode(){
 */
 void Program::setDebugMode(bool debug_res){
     this->debug = debug_res;
+    ended = false;
     parent->updateOutput(QString());
+    parent->ui->cmdLineEdit->setText("");
+    parent->waitInput = false;
     init();
 }
 
@@ -268,10 +279,13 @@ QString Program::showBreakpoints(){
 * Exit the debug mode.
 */
 void Program::exitDebug(){
+    ended = true;
     debug = false;
     breakpoint_blocked = false;
+    parent->waitInput = false;
     clearBreakpoints();
     parent->updateOutput(QString());
+    parent->ui->cmdLineEdit->setText("");
 }
 
 /* Program::resume

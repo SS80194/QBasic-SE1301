@@ -20,14 +20,15 @@ private:
     std::map<QString, int> variables;
 /* Useful in debug mode*/
     bool debug=false;
-    bool breakpoint_blocked=false;
+    volatile bool breakpoint_blocked=false;
+    volatile bool ended=false;
     std::set<int> breakpoints;
 friend class Statement;
 friend class Tokenizer;
 friend class Expression;
 
 public:
-    void blockTillFalse(bool &var);
+    void blockTillFalse(volatile bool &var);
 
 public:
     Program(MainWindow *parent);
