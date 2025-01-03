@@ -133,6 +133,7 @@ bool MainWindow::parseCommand(const QString& s)
         return true;
     } else if (argv0.toInt()) {
         // Handle <number> <statement> command
+        if(program->inDebugMode()) return false;
         if(program->updateStatement(argv0.toInt(), argv1)) 
             return true;
     } else if (QString::compare(argv0, "ADD") == 0) {
@@ -147,7 +148,7 @@ bool MainWindow::parseCommand(const QString& s)
         program->setBreakpoint(line);
         return true;
     } else if (QString::compare(argv0, "DELETE") == 0) {
-    if(!program->inDebugMode()) return false;
+        if(!program->inDebugMode()) return false;
         bool ok;
         int line = argv1.toInt(&ok);
         if (!ok) {
