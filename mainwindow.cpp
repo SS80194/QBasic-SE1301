@@ -162,15 +162,18 @@ bool MainWindow::parseCommand(const QString& s)
     } else if(QString::compare(argv0, "PRINT") == 0){
         if(program->inDebugMode()) return false;
         program_temp->executeStatement(s);
+        return true;
     }
     else if(QString::compare(argv0, "LET") == 0){
         if(program->inDebugMode()) return false;
         program_temp->executeStatement(s);
+        return true;
     }
     else if(QString::compare(argv0, "INPUT") == 0){
         //handle the command in programtemp
         if(program->inDebugMode()) return false;
         program_temp->executeStatement(s);
+        return true;
     }
     // Default:Handle invalid command
     return false;
@@ -198,6 +201,7 @@ bool MainWindow::loadProgram(const QString& filename){
     QTextStream in(&file);
     QString line;
     program->clear();
+    updateOutput(QString());
     while (!in.atEnd()) {
         line = in.readLine();
         if(!parseCommand(line)){
@@ -206,7 +210,6 @@ bool MainWindow::loadProgram(const QString& filename){
             return false;
         }
     }
-    updateOutput(QString());
     return true;
 }
 

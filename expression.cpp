@@ -2,6 +2,7 @@
 #include "program.h"
 #include <QDebug>
 #include <QQueue>
+#include "config.h"
 
 /*
  * ExpressionNode
@@ -25,6 +26,12 @@ Expression::Expression(const QString& s_res,Program* program) : s(s_res),program
     //Step1. Tokenize the expression.
     Tokenizer tokenizer(s,program);
     tokenizer.tokenize(tokens);
+    if(debugMode){
+        qDebug() << "s: " << s;
+        for(Token t : tokens){
+            qDebug() <<"token: " << t.s << " " << t.type << " " << t.opt << " " << t.num;
+        }
+    }
     pos=0;
     //Step2. Parse the expression to a tree.
     root = parseExp();

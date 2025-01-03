@@ -80,6 +80,7 @@ void Tokenizer::tokenize(QVector<Token>& tokens){
             temp.s = s[p];
             temp.type = ExpNodeType::operation;
             if(s[p]=='*'&&nextChar(p)=='*'){
+                temp.s = "**";
                 temp.opt = ExpOperation::power;
                 pz++;
             }
