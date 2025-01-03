@@ -27,10 +27,10 @@ Expression::Expression(const QString& s_res,Program* program) : s(s_res),program
     Tokenizer tokenizer(s,program);
     tokenizer.tokenize(tokens);
     if(debugMode){
-        qDebug() << "s: " << s;
-        for(Token t : tokens){
-            qDebug() <<"token: " << t.s << " " << t.type << " " << t.opt << " " << t.num;
-        }
+        //qDebug() << "s: " << s;
+        //for(Token t : tokens){
+        //    qDebug() <<"token: " << t.s << " " << t.type << " " << t.opt << " " << t.num;
+        //}
     }
     pos=0;
     //Step2. Parse the expression to a tree.
@@ -55,43 +55,38 @@ int Expression::evaluate() {
 
 ExpressionNode* Expression::parseExp(){
     ExpressionNode* node = parseTerm();
-    if(pos==tokens.size()) return node;
-    else if(tokens[pos].s=="+"||tokens[pos].s=="-"){
+    while(pos < tokens.size() && (tokens[pos].s=="+" || tokens[pos].s=="-")){
         ExpressionNode* node2 = new ExpressionNode(tokens[pos]);
         consume();
         node2->children.push_back(node);
         node2->children.push_back(parseTerm());
-        return node2;
+        node = node2;
     }
-    else return node;
-    //throw std::invalid_argument("Invalid expression");
+    return node;
 }
 
 ExpressionNode* Expression::parseTerm(){
     ExpressionNode* node = parsePower();
-    if(pos==tokens.size()) return node;
-    else if(tokens[pos].s=="*"||tokens[pos].s=="/"||tokens[pos].s=="MOD"){
+    while(pos < tokens.size() && (tokens[pos].s=="*" || tokens[pos].s=="/" || tokens[pos].s=="MOD")){
+        ExpressionNode* node2 = new ExpressionNode(tokens[pos]);
+        consume();
+        node2->children.push_back(node);
+        node2->children.push_back(parsePower());
+        node = node2;
+    }
+    return node;
+}
+
+ExpressionNode* Expression::parsePower(){
+    ExpressionNode* node = parseFactor();
+    if(pos < tokens.size() && tokens[pos].s=="**"){
         ExpressionNode* node2 = new ExpressionNode(tokens[pos]);
         consume();
         node2->children.push_back(node);
         node2->children.push_back(parsePower());
         return node2;
     }
-    else return node;
-}
-
-ExpressionNode* Expression::parsePower(){
-    ExpressionNode* node = parseFactor();
-    if(pos==tokens.size()) return node;
-    else if(tokens[pos].s=="**"){
-        ExpressionNode* node2 = new ExpressionNode(tokens[pos]);
-        consume();
-        node2->children.push_back(node);
-        node2->children.push_back(parseFactor());
-        return node2;
-    }
-    else return node;
-
+    return node;
 }
 
 ExpressionNode* Expression::parseFactor(){
@@ -115,6 +110,13 @@ ExpressionNode* Expression::parseFactor(){
     else throw std::invalid_argument("Invalid expression");
 }
 
+int Expression::myMod(int a,int b){
+    int result = a % b;
+    if ((result < 0 && b > 0) || (result > 0 && b < 0)) {
+        result += b;
+    }
+    return result;
+}
 
 /*
  * Calculate the tree
@@ -139,7 +141,8 @@ int Expression::calculateTree(ExpressionNode* node){
         }
         else if(node->opt==ExpOperation::mod){
             if(right==0) throw std::invalid_argument("Division by zero");
-            node->value = left%right;
+            //TODO:implement a mod function to fit the requirement of the project.
+            node->value = myMod(left,right);
         }
         else if(node->opt==ExpOperation::power) node->value = pow(left,right);
         return node->value;

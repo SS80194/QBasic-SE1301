@@ -10,6 +10,7 @@ enum ExpNodeType{
     variable,
     number,
     operation,
+    bracket,
 };
 
 enum ExpOperation{

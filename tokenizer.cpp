@@ -1,4 +1,5 @@
 #include "tokenizer.h"
+#include <QDebug>
 
 /*
  * Tokenizer
@@ -16,7 +17,7 @@ QChar Tokenizer::nextChar(int pos) {
 }
 
 bool Tokenizer::isOperator(QChar c) {
-    return c == '+' || c == '-' || c == '*' || c == '/' || c == '^';
+    return c == '+' || c == '-' || c == '*' || c == '/' ;
 }
 
 //skipBlank:return the first non-blank character after pos
@@ -38,6 +39,7 @@ bool Tokenizer::isLetter(QChar c){
 void Tokenizer::tokenize(QVector<Token>& tokens){
     int p=0,pz=0;
     for(;p < s.size();){
+        //qDebug() << "p: " << p << "s[p]: " << s[p];
         pz = skipBlank(p);
         if(pz >= s.size()) break;
         p = pz;
@@ -45,11 +47,17 @@ void Tokenizer::tokenize(QVector<Token>& tokens){
         bool isLastTokenNumber = (tokens.size()>0&&tokens.back().type==ExpNodeType::number);
         if(isDigit(s[p])||(s[p]=='-'&&isDigit(nextChar(p))&&!isLastTokenNumber)){
             //find a number.
-            if(s[p]=='-') pz++;
+            bool isNegative = false;
+            if(s[p]=='-'){
+                isNegative = true;
+                p++;
+                pz=skipBlank(p);
+            }
             while(pz<s.size()&&isDigit(s[pz])) pz++;
             temp.s = s.mid(p,pz-p);
+            if(isNegative) temp.s = "-" + temp.s;
             temp.type = ExpNodeType::number;
-            temp.num = temp.s.toInt()*(s[p]=='-'?-1:1);
+            temp.num = temp.s.toInt();
             p = pz;
         }
         else if (isLetter(s[p])){
@@ -90,6 +98,14 @@ void Tokenizer::tokenize(QVector<Token>& tokens){
             else if (s[p]=='/') temp.opt = ExpOperation::divide;
 
             p = pz+1;
+        }
+        else if(s[p]=='('||s[p]==')'){
+            temp.s = s[p];
+            temp.type = ExpNodeType::bracket;
+            p = pz+1;
+        }
+        else{
+            throw std::invalid_argument(std::string("Invalid character: ") + s[p].toLatin1());
         }
         tokens.push_back(temp);
     }

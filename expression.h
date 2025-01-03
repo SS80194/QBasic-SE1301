@@ -39,6 +39,7 @@ private:
     ExpressionNode* root;
     int pos;
     void tokenize();
+    int myMod(int a,int b);
 
 private:
     void consume(){pos++;}

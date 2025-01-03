@@ -55,7 +55,7 @@ bool Program::updateStatement(int line, const QString& s)
             }
         }
         catch(std::exception& e){
-            qDebug() << e.what();
+            //qDebug() << e.what();
             return false;
         }
 
@@ -74,7 +74,7 @@ void Program::executeStatement(const QString& s){
         delete st;
     }
     catch(std::exception& e){
-        qDebug() << e.what();
+        //qDebug() << e.what();
     }
 }
 /* Program::execute
@@ -102,7 +102,7 @@ bool Program::execute()
             }
             int retpc = statements[pc]->execute();
             if(ended) return true;
-            qDebug()<<statements[pc]->getStatement();
+            //qDebug()<<statements[pc]->getStatement();
             if(retpc == -1)
                 return false;
             else if(retpc == 0){
@@ -127,10 +127,9 @@ bool Program::execute()
         return true;
     }
     catch(std::exception& e){
-        qDebug() << e.what();
+        //qDebug() << e.what();
         return false;
     }
-    
 }
 
 /* Program::clear
@@ -187,11 +186,15 @@ void Program::output(const QString& s)
 */
 void Program::input(const QString& s)
 {
-    parent->waitInput = true;
-    parent->ui->cmdLineEdit->setText("?");
-    blockTillFalse(parent->waitInput);
-    qDebug() << "input variable: " << s << "input value: " << parent->inputValue;
-    variables[s] = parent->inputValue;
+    if (background) {
+        variables[s] = parent->inputValue;
+    } else {
+        parent->waitInput = true;
+        parent->ui->cmdLineEdit->setText("?");
+        blockTillFalse(parent->waitInput);
+        variables[s] = parent->inputValue;
+    }
+    //qDebug() << "input variable: " << s << "input value: " << parent->inputValue;
 }
 
 /* Program::blockTillFalse
