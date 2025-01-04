@@ -2,6 +2,13 @@
 
 SE1301 软件基础实践 大作业
 
+
+# 幽默测试集，幽默文档，实现细节全靠猜？ 
+
+![](https://p3-sdbk2-media.byteimg.com/tos-cn-i-xv4ileqgde/cd04262ea55c4022b8504049d7293b4d~tplv-xv4ileqgde-resize-w:750.image)
+
+---
+
 ## 时间统计
 24.12.27 搭建框架
 Cursor 3:29:31

@@ -71,15 +71,6 @@ void Tokenizer::tokenize(QVector<Token>& tokens){
             else{
                 temp.type = ExpNodeType::variable;
                 temp.s = s.mid(p,pz-p);
-                //The code was used to find the variable,but it's not used now.
-                /*
-                if(program->variables.find(temp.s) == program->variables.end()){
-                    //Can't find the variable:The variable is not defined.
-                    QString error = "Variable "+temp.s+" not defined";
-                    throw std::invalid_argument(error.toStdString());   
-                }
-                else temp.num = program->variables[temp.s];
-                */
             }
             p = pz;
         }
