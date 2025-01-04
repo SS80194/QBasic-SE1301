@@ -46,12 +46,18 @@ bool Program::updateStatement(int line, const QString& s)
     }
     else{
         try{
+            QString trimmed_s;
+            for(int i = 0; i < s.size(); i++){
+                if(s[i] != ' '||(i>1&&s[i-1] != ' '))
+                    trimmed_s += s[i];
+            }
+
             if(statements.find(line) != statements.end()) {
-                statements[line]->setStatement(s);
+                statements[line]->setStatement(trimmed_s);
             }
             else{
                 statements[line] = new Statement(this);
-                statements[line]->setStatement(s);
+                statements[line]->setStatement(trimmed_s);
             }
         }
         catch(std::exception& e){
