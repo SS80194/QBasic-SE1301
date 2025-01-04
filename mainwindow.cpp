@@ -179,6 +179,9 @@ bool MainWindow::parseCommand(const QString& s)
         program_temp->executeStatement(s);
         return true;
     }
+    else if(QString::compare(argv0, "HELP") == 0){
+        QMessageBox::information(this, "Help", "Help information");
+    }
     // Default:Handle invalid command
     return false;
 }
