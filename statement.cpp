@@ -48,7 +48,8 @@ void Statement::parse(){
         pc = 0;
     }
     else if(QString::compare(argv0,"INPUT") == 0){
-        
+        if(!parent->isValidVariableName(argv1))
+            throw std::invalid_argument("Invalid variable name: " + argv1.toStdString());
         statementTree = "INPUT\n    " + argv1;
         pc = 0;
     }
@@ -60,7 +61,8 @@ void Statement::parse(){
 
         QString varName = argv1.left(equalIndex).trimmed();
         QString expression = argv1.mid(equalIndex + 1).trimmed();
-
+        if(!parent->isValidVariableName(varName)) 
+            throw std::invalid_argument("Invalid variable name: " + varName.toStdString());
         Expression* evaluator = new Expression(expression,parent);
         expressions.push_back(evaluator);
 
@@ -152,7 +154,8 @@ int Statement::execute()
 
         Expression evaluator(expression,parent);
         int result = evaluator.evaluate();
-        qDebug() << "input variable: " << varName << "input value: " << result;
+        if(!parent->isValidVariableName(varName)) 
+            throw std::invalid_argument("Invalid variable name: " + varName.toStdString());
         parent->variables[varName] = result;
         return 0;
     }

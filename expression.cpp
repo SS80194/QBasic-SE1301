@@ -125,8 +125,11 @@ int Expression::calculateTree(ExpressionNode* node){
     //qDebug() << "Evaluate: " << node->s ;
     if(node->type==ExpNodeType::number) return node->value;
     else if(node->type==ExpNodeType::variable){
+        if (!program->isValidVariableName(node->s)) {
+            throw std::invalid_argument("Invalid variable name: " + node->s.toStdString());
+        }
         if(program->variables.find(node->s)==program->variables.end()) 
-            throw std::invalid_argument("Variable not found");
+            throw std::invalid_argument("Variable not found: " + node->s.toStdString());
         else return program->variables[node->s];
     }
     else if(node->type==ExpNodeType::operation){

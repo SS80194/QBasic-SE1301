@@ -203,14 +203,15 @@ void Program::output(const QString& s)
 */
 void Program::input(const QString& s)
 {
-    if (background) {
-        variables[s] = parent->inputValue;
-    } else {
-        parent->waitInput = true;
-        parent->ui->cmdLineEdit->setText("?");
-        blockTillFalse(parent->waitInput);
-        variables[s] = parent->inputValue;
+    if (!isValidVariableName(s)) {
+        throw std::invalid_argument("Invalid variable name: " + s.toStdString());
     }
+
+    
+    parent->waitInput = true;
+    parent->ui->cmdLineEdit->setText("?");
+    blockTillFalse(parent->waitInput);
+    variables[s] = parent->inputValue;
     //qDebug() << "input variable: " << s << "input value: " << parent->inputValue;
 }
 
@@ -359,5 +360,31 @@ bool Program::parseAllStatements()
             return false;
         }
     }
+    return true;
+}
+
+/* Program::isValidVariableName
+* Check if the variable name is valid.
+* Rules:
+* 1. Must start with a letter or underscore
+* 2. Can only contain letters, numbers, and underscores
+* 3. Cannot be a keyword
+*/
+bool Program::isValidVariableName(const QString& name) const {
+    if (name.isEmpty()) return false;
+    
+    // 检查是否是关键字
+    if (keywords.find(name) != keywords.end()) return false;
+    
+    // 检查首字符
+    QChar first = name[0];
+    if (!first.isLetter() && first != '_') return false;
+    
+    // 检查其他字符
+    for (int i = 1; i < name.length(); i++) {
+        QChar c = name[i];
+        if (!c.isLetterOrNumber() && c != '_') return false;
+    }
+    
     return true;
 }

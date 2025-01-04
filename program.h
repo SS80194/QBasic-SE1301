@@ -14,6 +14,11 @@ class Program
 private:
     bool background=false;
     MainWindow *parent;
+    const std::set<QString> keywords = {
+        "LOAD", "RUN", "CLEAR", "QUIT", "LIST", "ADD", "DELETE", "PRINT", "LET", "INPUT",
+        "GOTO", "IF", "THEN", "END", "REM", "MOD"
+    };
+    bool isValidVariableName(const QString& name) const;
 /* Statements of the program.*/
     int pc;//program counter: the current line number of the program
     std::map<int, Statement*> statements;
